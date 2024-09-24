@@ -15,11 +15,13 @@ def generate_rationale_and_answer(question, prompt_set, model=llama):
     Returns:
         str: Generated rationale and answer.
     """
+
     prompt = (
         f"{prompt_set}\n\n"
         "Please solve the following problem in a step-by-step process and provide a detailed explanation. "
         "Do not reference any options or external information. "
-        "Ensure that you end your response with your answer in the format \"Answer: [text]\".\n\n"
+        "Ensure that you end your response with your answer in the format \"Answer: [full answer]\". "
+        "If the answer consists of multiple items or a phrase, please include that in your Answer.\n\n"
         f"Question: {question}\n"
         "\nAnswer Explanation:"
     )
