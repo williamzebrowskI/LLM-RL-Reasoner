@@ -1,1 +1,4 @@
 /.venv
+test.jsonl
+train.jsonl
+valid.jsonl
