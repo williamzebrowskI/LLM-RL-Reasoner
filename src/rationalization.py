@@ -2,7 +2,7 @@
 import ollama
 from .utils import is_rationale_correct
 
-def rationalize(question, options, correct_answer, prompt_set, model="llama3.1:8b"):
+def rationalize(question, correct_answer, model="llama3-1-reason-v01:latest"):
     """
     Generates a correct rationale for a question given the correct answer.
 
@@ -16,18 +16,14 @@ def rationalize(question, options, correct_answer, prompt_set, model="llama3.1:8
         str: The generated rationale.
     """
     # Prepare the options text
-    options_text = '\n'.join([f"{key}: {value}" for key, value in options.items()])
+    # options_text = '\n'.join([f"{key}: {value}" for key, value in options.items()])
 
     # Construct the input prompt with explicit instructions
     input_text = (
-        prompt_set
-        + "\n\n"
-        + "Provide a detailed explanation for the following question, ensuring that the explanation clearly justifies why the correct answer is chosen.\n"
-        + f"Question: {question}\n"
-        + "Options:\n"
-        + options_text + "\n"
-        + f"Correct Answer: {correct_answer}\n"
-        + "Explanation:"
+        "Provide a detailed explanation for the following question, ensuring that the explanation clearly justifies why the correct answer is chosen.\n"
+        f"Question: {question}\n"
+        f"Correct Answer: {correct_answer}\n"
+        "Explanation:"
     )
 
     try:
