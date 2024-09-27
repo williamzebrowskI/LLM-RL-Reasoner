@@ -3,8 +3,9 @@ import ollama
 
 qwen = "qwen2.5:7b"
 llama = "llama3.1:8b"
+llama2 = "llama3.2:3b"
 
-def generate_rationale_and_answer(question, prompt_set, model=llama):
+def generate_rationale_and_answer(question, prompt_set, model=llama2):
     """
     Generates a rationale and answer for a given question using the language model.
 
