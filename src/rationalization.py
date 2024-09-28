@@ -2,7 +2,7 @@
 import ollama
 from .utils import is_rationale_correct
 
-def rationalize(question, correct_answer, model="llama3-1-reason-v01:latest"):
+def rationalize(question, correct_answer, prompt_set):
     """
     Generates a correct rationale for a question given the correct answer.
 
@@ -15,20 +15,20 @@ def rationalize(question, correct_answer, model="llama3-1-reason-v01:latest"):
     Returns:
         str: The generated rationale.
     """
-    # Prepare the options text
-    # options_text = '\n'.join([f"{key}: {value}" for key, value in options.items()])
 
     # Construct the input prompt with explicit instructions
     input_text = (
-        "Provide a detailed explanation for the following question, ensuring that the explanation clearly justifies why the correct answer is chosen.\n"
+        f"{prompt_set}\n\n"
+        "With the provided examples above, provide a detailed explanation for the following question, ensuring that the explanation clearly justifies why the correct answer is chosen.\n"
+        "Ensure that you end your response with your concise answer in the format \"Answer: [answer]\". \n\n"
         f"Question: {question}\n"
-        f"Correct Answer: {correct_answer}\n"
+        f"Correct Answer: {correct_answer}\n\n"
         "Explanation:"
     )
 
     try:
         # Use Ollama (or your LLM) to get the response
-        response = ollama.chat(model=model, messages=[
+        response = ollama.chat(model="llama3.1:8b", messages=[
             {
                 'role': 'user',
                 'content': input_text,
@@ -36,17 +36,9 @@ def rationalize(question, correct_answer, model="llama3-1-reason-v01:latest"):
         ])
 
         # Extract the generated rationale
-        generated_rationale_full = response['message']['content'].strip()
+        generated_rationale = response['message']['content'].strip()
 
-        # Assign the entire response as the rationale
-        generated_rationale = generated_rationale_full
-
-        # Optionally, verify the rationale's correctness
-        if is_rationale_correct(generated_rationale, correct_answer, question):
-            return generated_rationale
-        else:
-            print(f"Generated rationale does not sufficiently explain the correct answer for question: {question}")
-            return ''
+        return generated_rationale
 
     except Exception as e:
         print(f"Error during rationalization: {e}")

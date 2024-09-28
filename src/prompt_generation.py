@@ -1,5 +1,6 @@
 from .parsing import parse_options
 from .utils import escape_special_characters
+import ollama
 import re
 
 def create_prompt_examples(ds_train, num_examples):
@@ -86,17 +87,38 @@ def get_correct_answer_text(options, correct_label):
     Retrieves the answer text corresponding to the correct label.
     
     Args:
-        options (list): List of option strings (e.g., ['A) $60.00', 'B) $35.42', ...]).
+        options (list): List of option strings (e.g., ['A) 12', 'B) 6', ...]).
         correct_label (str): Correct answer label (e.g., 'A').
         
     Returns:
-        str: The correct answer text (e.g., '$60.00') or None if not found.
+        str: The correct answer text (e.g., '12') or None if not found.
     """
+    pattern = re.compile(rf'^{re.escape(correct_label.upper())}\)\s*(.*)$')
+    
     for opt in options:
-        if opt.startswith(f"{correct_label})"):
-            return opt.split(')', 1)[1].strip()
+        match = pattern.match(opt.strip())
+        if match:
+            return match.group(1).strip()
+    
     print(f"Warning: Correct answer label '{correct_label}' not found in options.")
     return None
+
+def extract_answer_text(rationale):
+    """
+    Extracts the answer text from the rationale using regex.
+    
+    Args:
+        rationale (str): Generated rationale string.
+    
+    Returns:
+        str or None: Extracted answer text if found, else None.
+    """
+    # Attempt to extract the answer text after 'Answer:'
+    match = re.search(r'Answer:\s*(.+)', rationale, re.IGNORECASE)
+    if match:
+        return match.group(1)
+    return None
+
 
 def create_prompt_set(ds_train, num_examples):
     """
@@ -142,3 +164,31 @@ def create_prompt_set(ds_train, num_examples):
             correct_answer_text
         )
     return prompt_set
+
+def eval_answer_prompt(correct_answer, extracted_answer):
+
+    eval_response = ollama.chat(model="llama3.1:8b", messages=[
+            {
+                'role': 'user',
+                'content':
+                f"""
+                    Your task is to compare two numerical answers and determine if they are the same answer, ignoring differences in units or formatting.\n\n
+                    Comparison Rules:\n\n
+                    - If the answers are the same, for example, First Answer: '90' and Second Answer: '90 miles' or ( km, %, sec, ml, etc) this is a match and return 'correct' in your response.\n
+                    - If the answers are different, consider them NOT a match and return 'incorrect' in your response.\n\n
+                    Ignore differences in formatting, such as trailing zeros.\n\n
+
+                    Compare the Following Answers:\n
+                    First answer: {correct_answer}\n
+                    Second answer: {extracted_answer}\n\n
+                    Respond with:\n
+                    "correct" if the two answers are the same\n
+                    "incorrect" if the two answers are not the same\n\n
+                    Please respond with only one of the above options, without any explanations.
+                """
+            },
+     ])
+    
+    decision = eval_response['message']['content'].strip()
+    return decision
+
