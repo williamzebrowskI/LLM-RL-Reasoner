@@ -3,7 +3,7 @@ import ollama
 
 qwen = "qwen2.5:7b"
 llama = "llama3.1:8b"
-llama2 = "llama3.2:3b"
+llama_ft = "llama-reason-04:latest"
 
 def generate_rationale_and_answer(question, prompt_set, model=llama):
     """
@@ -46,3 +46,33 @@ def generate_rationale_and_answer(question, prompt_set, model=llama):
         generated_rationale = ''
     
     return generated_rationale
+
+
+def eval_rationale(correct_answer_text, extracted_answer):
+
+    response = ollama.chat(model=llama_ft, messages=[
+            {
+                'role': 'user',
+                'content':
+                f"""
+                    You are a evaltiona assistant is to compare two numerical answers and determine if they are the same answer, ignoring differences in units or formatting.\n\n
+                    Comparison Rules:\n\n
+                    - If the answers are the same, for example, First Answer: '90' and Second Answer: '90 m' or ( km, %, sec, ml, etc) this is a correct match since numerically the same and return 'correct' in your response.\n
+                    - If the answers are different, consider them NOT a match and return 'incorrect' in your response.\n\n
+                    Ignore differences in formatting, such as trailing zeros.\n\n
+
+                    Compare the Following Answers:\n
+                    First answer: {extracted_answer}\n
+                    Second answer: {correct_answer_text}\n\n
+                    Respond with:\n
+                    "correct" if the two answers are the same\n
+                    "incorrect" if the two answers are not the same\n\n
+                    Please respond with only one of the above options, without any explanations.
+                """
+            },
+     ])
+
+
+    decision = response['message']['content'].strip()
+
+    return decision
