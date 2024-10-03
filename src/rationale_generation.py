@@ -4,6 +4,7 @@ import ollama
 qwen = "qwen2.5:7b"
 llama = "llama3.1:8b"
 llama_ft = "llama-reason-04:latest"
+llama_ft_v5 = "llama-reason-05:latest"
 
 def generate_rationale_and_answer(question, prompt_set, model=llama):
     """
@@ -32,7 +33,7 @@ def generate_rationale_and_answer(question, prompt_set, model=llama):
     )
     
     try:
-        response = ollama.chat(model=model, messages=[
+        response = ollama.chat(model=llama_ft, messages=[
             {
                 'role': 'user',
                 'content': prompt,
@@ -50,7 +51,7 @@ def generate_rationale_and_answer(question, prompt_set, model=llama):
 
 def eval_rationale(correct_answer_text, extracted_answer):
 
-    response = ollama.chat(model=llama_ft, messages=[
+    response = ollama.chat(model=llama, messages=[
             {
                 'role': 'user',
                 'content':
