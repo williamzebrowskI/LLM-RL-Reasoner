@@ -3,6 +3,7 @@ import ollama
 from .utils import is_rationale_correct
 
 llama_ft = "llama-reason-04:latest"
+llama_v5 = "llama-reason-05:latest"
 
 prompt_set = """
 Example 1:\n\n
@@ -39,26 +40,52 @@ def rationalize(question, correct_answer):
         str: The generated rationale.
     """
 
-    rationalization_prompt = (
-        f"{prompt_set}\n\n"
-        "The examples above demonstrate how you should output your response.\n"
-        "Please follow the instructions below for this task:\n"
-        "1. Provide a concise step-by-step explanation for the following question, ensuring that the reasoning naturally leads to an answer.\n"
-        "2. You are forbidden to reference or imply that a correct answer or hint was provided in advance.\n"
-        "3. Perform your calculations and reasoning based solely on the information given in the question.\n"
-        "6. After your explanation and any necessary corrections, you MUST end your response with 'Answer: [final answer]' in a similar format as the examples above.\n\n"
-        f"Question: {question}\n"
-        f"Hint: The correct answer is {correct_answer}\n"
-        "Answer Explanation: \n"
-        "Answer: "
-    )
+    # prompt = (
+    #     "You are a reasoning assistant that provides clear, step-by-step explanations to arrive at a final calculated answer.\n"
+    #     "\n"
+    #     "Instructions:\n"
+    #     "1. To understand what is being asked, you must break the question down.\n"
+    #     "2. Walk through the problem step by step to formulate an calculated answer.\n"
+    #     "3. You will be given a hint to guide your reasoning steps only.\n"
+    #     f"Question: {question}\n\n"
+    #     "Respond with:\n"
+    #     "Your step by step reasoning\n"
+    #     "Your final answer, 'Answer: '\n\n"
+    #     "About the Hint:\n"
+    #     "1. Never reveal you were given a hint in your response.\n"
+    #     "2. Do NOT use the hint as your placeholder for the answer unless your calculations leads to that answer.\n"
+    #     "3. Your final step-by-step calculated answer must match the hint."
+    #     f"Here is the hint, {correct_answer}"
+    # )
+    # prompt = (
+    #     "You are a reasoning assistant that provides clear, step-by-step explanations to arrive at a final calculated answer.\n\n"
+    #     "Instructions:\n"
+    #     "1. Break down the question to understand what is being asked.\n"
+    #     "2. Provide a logical, step-by-step reasoning to reach the calculated answer.\n"
+    #     "3. Use the hint provided to guide your reasoning steps, but do not mention the hint in your response.\n"
+    #     "4. Ensure your final calculated answer matches the hint.\n\n"
+    #     f"Question:\n{question}\n\n"
+    #     "Respond with:\n"
+    #     "- Your step-by-step reasoning.\n"
+    #     "- Your final answer, MUST be formatted as 'Answer: __ '\n\n"
+    #     f"Hint: {correct_answer}\n"
+    #     "1. Never reveal you were given a hint in your response.\n"
+    #     "2. Do NOT use the hint as your placeholder for the answer unless your calculations leads to that answer.\n"
+    # )
+
+    prompt = ("You are an expert in solving complex problems. Given the correct answer, provide a comprehensive "
+            "step-by-step rationale for why it is correct. Every calculation, not matter how small it may be should be a step in the rationale.\n\n"
+            f"Question: {question}\n"
+            f"Correct Answer: {correct_answer}\n"
+            "A: Let's break this down step-by-step:\n\n")
+
 
     try:
         # Use Ollama (or your LLM) to get the response
-        response = ollama.chat(model=llama_ft, messages=[
+        response = ollama.chat(model=llama_v5, messages=[
             {
                 'role': 'user',
-                'content': rationalization_prompt,
+                'content': prompt,
             },
         ])
 

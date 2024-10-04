@@ -4,6 +4,7 @@ import ollama
 qwen = "qwen2.5:7b"
 llama = "llama3.1:8b"
 llama_ft = "llama-reason-04:latest"
+llama_ft_v5 = "llama-reason-05:latest"
 
 def generate_rationale_and_answer(question, prompt_set, model=llama):
     """
@@ -25,14 +26,24 @@ def generate_rationale_and_answer(question, prompt_set, model=llama):
         "1. Solve the following problem step-by-step.\n"
         "2. Provide a detailed explanation that justifies the correct answer.\n"
         "3. Do not reference any options or external information.\n"
-        "4. You MUST end your response with your answer in the format \"Answer: [full answer]\".\n"
+        "4. You MUST end your response with your answer in the format of the examples, ie 'Answer: '\n"
         "---\n\n"
         f"Question: {question}\n\n"
         "Answer Explanation:\n"
     )
+
+    # prompt = (
+    #     f"{prompt_set}\n\n"
+    #     "Use the examples above to format your response."
+    #     "You are an expert in answering complex questions. Provide a step-by-step rationale for your answer, "
+    #     "considering all relevant aspects. Be thorough and logical. After your rationale, clearly state your final answer. "
+    #     "You MUST end your response with your answer in the format of the examples, ie 'Answer: \n\n"
+
+    #     f"Question: {question}\n\n"
+    #     "Let's approach this step-by-step\n\n")
     
     try:
-        response = ollama.chat(model=model, messages=[
+        response = ollama.chat(model=llama_ft, messages=[
             {
                 'role': 'user',
                 'content': prompt,
@@ -50,7 +61,7 @@ def generate_rationale_and_answer(question, prompt_set, model=llama):
 
 def eval_rationale(correct_answer_text, extracted_answer):
 
-    response = ollama.chat(model=llama_ft, messages=[
+    response = ollama.chat(model=llama, messages=[
             {
                 'role': 'user',
                 'content':
