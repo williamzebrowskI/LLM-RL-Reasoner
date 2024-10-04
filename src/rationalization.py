@@ -73,7 +73,7 @@ def rationalize(question, correct_answer):
     #     "2. Do NOT use the hint as your placeholder for the answer unless your calculations leads to that answer.\n"
     # )
 
-    prompt = ("You are an expert in explaining complex concepts. Given the correct answer, provide a comprehensive "
+    prompt = ("You are an expert in solving complex problems. Given the correct answer, provide a comprehensive "
             "step-by-step rationale for why it is correct. Consider multiple angles and potential counterarguments.\n\n"
             f"Question: {question}\n"
             f"Correct Answer: {correct_answer}\n"

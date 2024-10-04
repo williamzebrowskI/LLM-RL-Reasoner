@@ -18,19 +18,29 @@ def generate_rationale_and_answer(question, prompt_set, model=llama):
         str: Generated rationale and answer.
     """
 
+    # prompt = (
+    #     f"{prompt_set}\n\n"
+    #     "---\n"
+    #     "The examples above are how you should answer and explain the answer to the question you are given.\n"
+    #     "Follow the instructions below in this task:\n"
+    #     "1. Solve the following problem step-by-step.\n"
+    #     "2. Provide a detailed explanation that justifies the correct answer.\n"
+    #     "3. Do not reference any options or external information.\n"
+    #     "4. You MUST end your response with your answer in the format of the examples, ie 'Answer: "\n"
+    #     "---\n\n"
+    #     f"Question: {question}\n\n"
+    #     "Answer Explanation:\n"
+    # )
+
     prompt = (
         f"{prompt_set}\n\n"
-        "---\n"
-        "The examples above are how you should answer and explain the answer to the question you are given.\n"
-        "Follow the instructions below in this task:\n"
-        "1. Solve the following problem step-by-step.\n"
-        "2. Provide a detailed explanation that justifies the correct answer.\n"
-        "3. Do not reference any options or external information.\n"
-        "4. You MUST end your response with your answer in the format \"Answer: [full answer]\".\n"
-        "---\n\n"
+        "Use the examples above to format your response."
+        "You are an expert in answering complex questions. Provide a step-by-step rationale for your answer, "
+        "considering all relevant aspects. Be thorough and logical. After your rationale, clearly state your final answer. "
+        "You MUST end your response with your answer in the format of the examples, ie 'Answer: \n\n"
+
         f"Question: {question}\n\n"
-        "Answer Explanation:\n"
-    )
+        "Let's approach this step-by-step\n\n")
     
     try:
         response = ollama.chat(model=llama_ft, messages=[
