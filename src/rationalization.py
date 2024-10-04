@@ -74,10 +74,11 @@ def rationalize(question, correct_answer):
     # )
 
     prompt = ("You are an expert in solving complex problems. Given the correct answer, provide a comprehensive "
-            "step-by-step rationale for why it is correct. Consider multiple angles and potential counterarguments.\n\n"
+            "step-by-step rationale for why it is correct. Every calculation, not matter how small it may be should be a step in the rationale.\n\n"
             f"Question: {question}\n"
             f"Correct Answer: {correct_answer}\n"
             "A: Let's break this down step-by-step:\n\n")
+
 
     try:
         # Use Ollama (or your LLM) to get the response
